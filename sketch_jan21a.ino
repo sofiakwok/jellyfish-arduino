@@ -29,7 +29,7 @@ void setup() {
   fin1.attach(10);
   fin2.attach(11);
   stroke.write(0);
-  fin1.write(180);
+  fin1.write(180); //because fin1 is flipped
   fin2.write(0);
   Serial.begin(9600);
 }
