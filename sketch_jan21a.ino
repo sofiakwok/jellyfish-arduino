@@ -25,9 +25,9 @@ bool newData = false;
 
 void setup() {
   // put your setup code here, to run once:
-  stroke.attach(9); 
-  fin1.attach(10);
-  fin2.attach(11);
+  stroke.attach(9); // for controlling theta
+  fin1.attach(10); // for controlling rudder 1
+  fin2.attach(11); // for controlling rudder 2
   stroke.write(0);
   fin1.write(180); //because fin1 is flipped
   fin2.write(0);
@@ -36,34 +36,31 @@ void setup() {
 
 void loop() {
   recvOneChar();
-  //go to max stroke diameter (180) gently
-  /*for(theta = 0; theta < 180; theta++){
-    
-  }*/
     // stroke continuously scans from 0 to 180 degrees
+    // fins actually go from 0 to 90 because of the 2:1 gear ratio
   while(startLoop){
-    Serial.print("\n Loop 1 \n");
+    //Serial.print("\n Loop 1 \n");
     for(theta = 0; theta < 175; theta++)  
     {       
       recvOneChar();
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
-      Serial.print(" ");
+      //Serial.print(beta_1);
+      //Serial.print(" ");
       fin1.write(180 - beta_1);
       fin2.write(beta_2);                
       delay(5);                   
     } 
-    Serial.print("\n Loop 2 \n");
+    //Serial.print("\n Loop 2 \n");
     for(theta = 175; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_2);
-      Serial.print(" ");
+      //Serial.print(beta_2);
+      //Serial.print(" ");
       fin1.write(180 - beta_1);
       fin2.write(beta_2);           
       delay(5);       
@@ -105,6 +102,11 @@ void showNewData() {
         alpha_2 = threshold * sign;
       }
       newData = false;
+      Serial.print("alpha_1: ");
+      Serial.print(alpha_1);
+      Serial.print(" alpha_2: ");
+      Serial.print(alpha_2);
+ 
   }
 }
 
@@ -119,7 +121,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double theta = theta_deg * 3.1415/180/2;
   double alpha = alpha_deg * 3.1415/180;
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
-  //all measurements in inches
+  //all measurements in inches and taken from Solidworks
   double d = 3.052717;
   double l = 0.568898;
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
@@ -148,7 +150,6 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-    //TODO: add checker to see if a - 4*b*c is negative and if so switch to using other root
     top = sqrt(a - 4*b*c) - 2*l*m_1 + 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
@@ -165,7 +166,6 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(0.5*top/bottom));
-  //TODO: add sanity check for beta
   //convert back to degrees 
   double beta_deg = 180/3.1415*beta;
   return beta_deg;
