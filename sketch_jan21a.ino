@@ -14,11 +14,6 @@ double alpha_2 = 0;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
 
-double fin_len = 2.15;
-double rudder_len = 0.48;
-double motor_len = 0.56;
-double steer_len = 3.05;
-
 char receivedChar;
 bool startLoop = false;
 bool newData = false;
@@ -102,11 +97,6 @@ void showNewData() {
         alpha_2 = threshold * sign;
       }
       newData = false;
-      Serial.print("alpha_1: ");
-      Serial.print(alpha_1);
-      Serial.print(" alpha_2: ");
-      Serial.print(alpha_2);
- 
   }
 }
 
@@ -122,8 +112,10 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double alpha = alpha_deg * 3.1415/180;
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
   //all measurements in inches and taken from Solidworks
-  double d = 3.052717;
-  double l = 0.568898;
+  double d = 3.052717; // length of outer servo attachment to steer rudders 
+  double l = 0.483608; // length of rudders
+  double fin_len = 2.15178;
+  
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
   // assumes fin rotational axis is at (0, 0)
   double m_1 = 0;
@@ -145,8 +137,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     m_2 = 0.405512;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = rudder_len*sin(alpha - theta) + x_1;
-    y_2 = -rudder_len*cos(alpha - theta) + y_1;
+    x_2 = l*sin(alpha - theta) + x_1;
+    y_2 = -l*cos(alpha - theta) + y_1;
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
@@ -157,8 +149,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     m_2 = 0.405512;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = rudder_len*sin(alpha + theta) + x_1;
-    y_2 = -rudder_len*cos(alpha + theta) + y_1;
+    x_2 = l*sin(alpha + theta) + x_1;
+    y_2 = -l*cos(alpha + theta) + y_1;
     a = pow(4*l*x_2 - 4*l*m_1, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
