@@ -11,6 +11,8 @@ double beta_2;
 //left = negative, right = positive
 double alpha_1 = 0;
 double alpha_2 = 0;
+double beta_1_offset = 5;
+double beta_2_offset = 7;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
 
@@ -24,8 +26,8 @@ void setup() {
   fin1.attach(10); // for controlling rudder 1
   fin2.attach(11); // for controlling rudder 2
   stroke.write(0);
-  fin1.write(180); //because fin1 is flipped
-  fin2.write(0);
+  fin1.write(180 - beta_1_offset); //because fin1 is flipped
+  fin2.write(0 + beta_2_offset);
   Serial.begin(9600);
 }
 
@@ -34,31 +36,31 @@ void loop() {
     // stroke continuously scans from 0 to 180 degrees
     // fins actually go from 0 to 90 because of the 2:1 gear ratio
   while(startLoop){
-    //Serial.print("\n Loop 1 \n");
-    for(theta = 0; theta < 175; theta++)  
+    Serial.print("\n Loop 1 \n");
+    for(theta = 0; theta < 170; theta++)  
     {       
       recvOneChar();
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      //Serial.print(beta_1);
-      //Serial.print(" ");
-      fin1.write(180 - beta_1);
-      fin2.write(beta_2);                
-      delay(5);                   
+      Serial.print(beta_1);
+      Serial.print(" ");
+      fin1.write(180 - beta_1 - beta_1_offset);
+      fin2.write(beta_2 + beta_2_offset);                
+      delay(15);                   
     } 
-    //Serial.print("\n Loop 2 \n");
-    for(theta = 175; theta > 0; theta--)    
+    Serial.print("\n Loop 2 \n");
+    for(theta = 170; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      //Serial.print(beta_2);
-      //Serial.print(" ");
-      fin1.write(180 - beta_1);
-      fin2.write(beta_2);           
-      delay(5);       
+      Serial.print(beta_1);
+      Serial.print(" ");
+      fin1.write(180 - beta_1 - beta_1_offset);
+      fin2.write(beta_2 + beta_2_offset);           
+      delay(15);       
     }
   }
 }
@@ -103,6 +105,7 @@ void showNewData() {
 void update_rudders(double theta, double alpha_1, double alpha_2){
   bool left;
   beta_1 = beta_calc(alpha_1, theta, left=true);
+  //Serial.print((String)"(alpha_1: " + alpha_1 + " theta: " + theta + " beta_1: " + beta_1 ")");
   beta_2 = beta_calc(alpha_2, theta, left=false);
 }
 
@@ -137,8 +140,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     m_2 = 0.405512;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = l*sin(alpha - theta) + x_1;
-    y_2 = -l*cos(alpha - theta) + y_1;
+    x_2 = (l + fin_len)*sin(theta);//l*sin(alpha - theta) + x_1;
+    y_2 = -(l + fin_len)*cos(theta);//-l*cos(alpha - theta) + y_1;
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
