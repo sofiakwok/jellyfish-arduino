@@ -43,7 +43,7 @@ void loop() {
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
+      Serial.print(beta_2);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
@@ -56,7 +56,7 @@ void loop() {
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
+      Serial.print(beta_2);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
@@ -68,7 +68,11 @@ void loop() {
 void recvOneChar() {
     if (Serial.available() > 0) {
         receivedChar = Serial.read();
+        if (receivedChar == 'q'){
+        startLoop = false;
+        } else if (receivedChar == 'f'){
         startLoop = true;
+        }
         newData = true;
     }
 }
@@ -80,14 +84,11 @@ void showNewData() {
       Serial.println(receivedChar);
       if (receivedChar == 's'){
         alpha_1 -= 0.175;
-      } else if (receivedChar == 'w')
-      {
+      } else if (receivedChar == 'w'){
         alpha_1 += 0.175;
-      } else if (receivedChar == 'i')
-      {
+      } else if (receivedChar == 'i'){
         alpha_2 += 0.175;
-      } else if (receivedChar == 'k')
-      {
+      } else if (receivedChar == 'k'){
         alpha_2 -= 0.175;
       }
       if (abs(alpha_1) >= threshold) {
@@ -152,15 +153,15 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     m_2 = 0.405512;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = l*sin(alpha + theta) + x_1;
-    y_2 = -l*cos(alpha + theta) + y_1;
+    x_2 = (l + fin_len)*sin(theta);//l*sin(alpha + theta) + x_1;
+    y_2 = -(l + fin_len)*cos(theta);//-l*cos(alpha + theta) + y_1;
     a = pow(4*l*x_2 - 4*l*m_1, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
-  double beta = 2*(atan(0.5*top/bottom));
+  double beta = 2*(atan2(0.5*top, bottom));
   //convert back to degrees 
   double beta_deg = 180/3.1415*beta;
   return beta_deg;
