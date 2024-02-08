@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <Math.h>
+#include <Complex.h>
 
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
@@ -43,7 +44,7 @@ void loop() {
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_2);
+      Serial.print(beta_1);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
@@ -56,7 +57,7 @@ void loop() {
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_2);
+      Serial.print(beta_1);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
@@ -136,32 +137,36 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double top = 0;
   double bottom = 0;
 
-  if (left){
-    m_1 = -0.153543;
+  if (left){ //for fin1 math
+    m_1 = 0.437008;
     m_2 = 0.405512;
-    x_1 = -fin_len*sin(theta);
+    x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = (l + fin_len)*sin(theta);//l*sin(alpha - theta) + x_1;
-    y_2 = -(l + fin_len)*cos(theta);//-l*cos(alpha - theta) + y_1;
-    a = pow(4*l*m_1 - 4*l*x_2, 2);
+    x_2 = l*sin(alpha + theta) + x_1;
+    y_2 = -l*cos(alpha + theta) + y_1;
+    a = pow(4*l*x_2 - 4*l*m_1, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-    top = sqrt(a - 4*b*c) - 2*l*m_1 + 2*l*x_2; 
+    double root = a - 4*b*c;
+    Complex c(root, 0);
+    top = c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
     m_1 = 0.074803;
     m_2 = 0.405512;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = (l + fin_len)*sin(theta);//l*sin(alpha + theta) + x_1;
-    y_2 = -(l + fin_len)*cos(theta);//-l*cos(alpha + theta) + y_1;
-    a = pow(4*l*x_2 - 4*l*m_1, 2);
+    x_2 = -l*sin(alpha + theta) + x_1;
+    y_2 = -l*cos(alpha + theta) + y_1;
+    a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-    top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
+    double root = a - 4*b*c;
+    Complex c(root, 0);
+    top = c.c_sqrt().real() + 2*l*m_1 - 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
-  double beta = 2*(atan2(0.5*top, bottom));
+  double beta = 2*(atan(0.5*top/bottom));
   //convert back to degrees 
   double beta_deg = 180/3.1415*beta;
   return beta_deg;
