@@ -38,26 +38,26 @@ void loop() {
     // fins actually go from 0 to 90 because of the 2:1 gear ratio
   while(startLoop){
     Serial.print("\n Loop 1 \n");
-    for(theta = 0; theta < 170; theta++)  
+    for(theta = 0; theta < 140; theta++)  
     {       
       recvOneChar();
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
+      Serial.print(beta_2);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
       delay(15);                   
     } 
     Serial.print("\n Loop 2 \n");
-    for(theta = 170; theta > 0; theta--)    
+    for(theta = 140; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
+      Serial.print(beta_2);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
@@ -152,9 +152,9 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     top = c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
-    m_1 = 0.074803;
+    m_1 = -0.276079;
     m_2 = 0.405512;
-    x_1 = fin_len*sin(theta);
+    x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
     x_2 = -l*sin(alpha + theta) + x_1;
     y_2 = -l*cos(alpha + theta) + y_1;
