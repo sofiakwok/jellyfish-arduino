@@ -38,7 +38,7 @@ void loop() {
     // fins actually go from 0 to 90 because of the 2:1 gear ratio
   while(startLoop){
     Serial.print("\n Loop 1 \n");
-    for(theta = 0; theta < 140; theta++)  
+    for(theta = 0; theta < 100; theta++)  
     {       
       recvOneChar();
       showNewData();            
@@ -51,7 +51,7 @@ void loop() {
       delay(15);                   
     } 
     Serial.print("\n Loop 2 \n");
-    for(theta = 140; theta > 0; theta--)    
+    for(theta = 100; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
@@ -118,7 +118,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
   //all measurements in inches and taken from Solidworks
   double d = 3.052717; // length of outer servo attachment to steer rudders 
-  double l = 0.483608; // length of rudders
+  double l = 0.56; // length of servo arm
+  double r = 0.483608; // length of rudders
   double fin_len = 2.15178;
   
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
@@ -138,35 +139,35 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double bottom = 0;
 
   if (left){ //for fin1 math
-    m_1 = 0.437008;
+    m_1 = -0.242625;
     m_2 = 0.405512;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = l*sin(alpha + theta) + x_1;
-    y_2 = -l*cos(alpha + theta) + y_1;
+    x_2 = r*sin(alpha + theta) + x_1;
+    y_2 = -r*cos(alpha + theta) + y_1;
     a = pow(4*l*x_2 - 4*l*m_1, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     double root = a - 4*b*c;
     Complex c(root, 0);
-    top = c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
+    top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-  } else {
-    m_1 = -0.276079;
+  } else { // for fin 2
+    m_1 = 0.242520;
     m_2 = 0.405512;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = -l*sin(alpha + theta) + x_1;
-    y_2 = -l*cos(alpha + theta) + y_1;
+    x_2 = -r*sin(alpha + theta) + x_1;
+    y_2 = -r*cos(alpha + theta) + y_1;
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     double root = a - 4*b*c;
     Complex c(root, 0);
-    top = c.c_sqrt().real() + 2*l*m_1 - 2*l*x_2; 
+    top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
-  double beta = 2*(atan(0.5*top/bottom));
+  double beta = 2*(atan(top/bottom));
   //convert back to degrees 
   double beta_deg = 180/3.1415*beta;
   return beta_deg;
