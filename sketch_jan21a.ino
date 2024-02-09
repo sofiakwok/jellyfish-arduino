@@ -44,7 +44,7 @@ void loop() {
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_2);
+      Serial.print(beta_1);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
@@ -57,7 +57,7 @@ void loop() {
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_2);
+      Serial.print(beta_1);
       Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
@@ -150,7 +150,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     double root = a - 4*b*c;
     Complex c(root, 0);
-    top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
+    top = 0.5*c.c_sqrt().real() + 2*l*m_1 - 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else { // for fin 2
     m_1 = 0.242520;
@@ -165,6 +165,9 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     double root = a - 4*b*c;
     Complex c(root, 0);
     top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
+    if (top < 0){
+      top = -0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
+    }
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(top/bottom));
