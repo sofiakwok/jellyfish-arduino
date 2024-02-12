@@ -117,9 +117,9 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double alpha = alpha_deg * 3.1415/180;
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
   //all measurements in inches and taken from Solidworks
-  double d = 3.052717; // length of outer servo attachment to steer rudders 
+  double d = 2.45; // length of outer servo attachment to steer rudders 
   double l = 0.56; // length of servo arm
-  double r = 0.483608; // length of rudders
+  double r = 0.2519; // length of rudders
   double fin_len = 2.15178;
   
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
