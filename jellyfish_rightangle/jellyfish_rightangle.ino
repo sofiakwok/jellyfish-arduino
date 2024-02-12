@@ -27,8 +27,8 @@ void setup() {
   fin1.attach(10); // for controlling rudder 1
   fin2.attach(11); // for controlling rudder 2
   stroke.write(0);
-  fin1.write(180 - beta_1_offset); //because fin1 is flipped
-  fin2.write(0 + beta_2_offset);
+  fin1.write(180 - 110); //because fin1 is flipped
+  fin2.write(110);
   Serial.begin(9600);
 }
 
@@ -44,8 +44,8 @@ void loop() {
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
-      Serial.print(" ");
+      // Serial.print(beta_1);
+      // Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
       delay(15);                   
@@ -57,8 +57,8 @@ void loop() {
       showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
-      Serial.print(beta_1);
-      Serial.print(" ");
+      // Serial.print(beta_1);
+      // Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
       delay(15);       
@@ -100,6 +100,7 @@ void showNewData() {
         int sign = (alpha_2 > 0) - (alpha_2 < 0);
         alpha_2 = threshold * sign;
       }
+      Serial.print((String)"(alpha_1: " + alpha_1 + " theta: " + theta + " alpha_2: " + alpha_2 + ")");
       newData = false;
   }
 }
@@ -119,7 +120,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   //all measurements in inches and taken from Solidworks
   double d = 2.45; // length of outer servo attachment to steer rudders 
   double l = 0.56; // length of servo arm
-  double r = 0.2519; // length of rudders
+  double r = 0.25; // length of rudders
   double fin_len = 2.15178;
   
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
