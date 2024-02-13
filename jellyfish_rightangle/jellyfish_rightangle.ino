@@ -140,8 +140,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double bottom = 0;
 
   if (left){ //for fin1 math
-    m_1 = -0.242625;
-    m_2 = 0.405512;
+    m_1 = -0.311024;
+    m_2 = 0.405394;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
     x_2 = r*sin(alpha + theta + 3.1415/2) + x_1;
@@ -154,8 +154,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     top = 0.5*c.c_sqrt().real() + 2*l*m_1 - 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else { // for fin 2
-    m_1 = 0.242520;
-    m_2 = 0.405512;
+    m_1 = 0.311024;
+    m_2 = 0.405394;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
     x_2 = -r*sin(alpha + theta + 3.1415/2) + x_1;
