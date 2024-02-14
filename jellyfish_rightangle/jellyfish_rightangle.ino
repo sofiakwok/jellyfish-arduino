@@ -12,8 +12,8 @@ double beta_2;
 //left = negative, right = positive
 double alpha_1 = 0;
 double alpha_2 = 0;
-double beta_1_offset = 5;
-double beta_2_offset = 7;
+double beta_1_offset = 15;
+double beta_2_offset = 17;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
 
@@ -26,9 +26,9 @@ void setup() {
   stroke.attach(9); // for controlling theta
   fin1.attach(10); // for controlling rudder 1
   fin2.attach(11); // for controlling rudder 2
-  stroke.write(0);
-  fin1.write(180 - 110); //because fin1 is flipped
-  fin2.write(110);
+  stroke.write(180);
+  fin1.write(180 - 100 - beta_1_offset); //because fin1 is flipped
+  fin2.write(100 + beta_2_offset);
   Serial.begin(9600);
 }
 
@@ -37,28 +37,28 @@ void loop() {
     // stroke continuously scans from 0 to 180 degrees
     // fins actually go from 0 to 90 because of the 2:1 gear ratio
   while(startLoop){
-    Serial.print("\n Loop 1 \n");
-    for(theta = 0; theta < 100; theta++)  
+    //Serial.print("\n Loop 1 \n");
+    for(theta = 180; theta > 0; theta--)  
     {       
       recvOneChar();
       showNewData();            
       stroke.write(theta);
-      update_rudders(theta, alpha_1, alpha_2);
-      // Serial.print(beta_1);
-      // Serial.print(" ");
+      update_rudders(180 - theta, alpha_1, alpha_2);
+      //Serial.print(beta_2);
+      //Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
       delay(15);                   
     } 
-    Serial.print("\n Loop 2 \n");
-    for(theta = 100; theta > 0; theta--)    
+    //Serial.print("\n Loop 2 \n");
+    for(theta = 0; theta < 180; theta++)    
     {
       recvOneChar();
       showNewData();                             
       stroke.write(theta);
-      update_rudders(theta, alpha_1, alpha_2);
-      // Serial.print(beta_1);
-      // Serial.print(" ");
+      update_rudders(180 - theta, alpha_1, alpha_2);
+      //Serial.print(beta_2);
+      //Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
       delay(15);       
@@ -84,13 +84,13 @@ void showNewData() {
       Serial.print("This just in ... ");
       Serial.println(receivedChar);
       if (receivedChar == 's'){
-        alpha_1 -= 0.175;
+        alpha_1 -= 10;
       } else if (receivedChar == 'w'){
-        alpha_1 += 0.175;
+        alpha_1 += 10;
       } else if (receivedChar == 'i'){
-        alpha_2 += 0.175;
+        alpha_2 += 10;
       } else if (receivedChar == 'k'){
-        alpha_2 -= 0.175;
+        alpha_2 -= 10;
       }
       if (abs(alpha_1) >= threshold) {
         int sign = (alpha_1 > 0) - (alpha_1 < 0);
@@ -119,7 +119,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
   //all measurements in inches and taken from Solidworks
   double d = 2.45; // length of outer servo attachment to steer rudders 
-  double l = 0.56; // length of servo arm
+  double l = 0.568898; // length of servo arm
   double r = 0.25; // length of rudders
   double fin_len = 2.15178;
   
@@ -166,9 +166,6 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     double root = a - 4*b*c;
     Complex c(root, 0);
     top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
-    if (top < 0){
-      top = -0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
-    }
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(top/bottom));
