@@ -3,8 +3,8 @@
 #include <Complex.h>
 
 Servo stroke;  // for controlling stroke motion (symmetrical)
-Servo fin1;
-Servo fin2;
+Servo fin1; //for controlling rudder angles
+Servo fin2; //for controlling rudder angles
 //beta_1 is left (looking from below), beta_2 is right 
 double beta_1;
 double beta_2;
@@ -112,7 +112,7 @@ void update_rudders(double theta, double alpha_1, double alpha_2){
 }
 
 double beta_calc(double alpha_deg, double theta_deg, bool left){
-  //convert degrees to radians and account for theta gear ratio
+  //convert degrees to radians and account for theta 2:1 gear ratio
   double theta = theta_deg * 3.1415/180/2;
   double alpha = alpha_deg * 3.1415/180;
   //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
@@ -138,7 +138,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double top = 0;
   double bottom = 0;
 
-  if (left){ //for fin1 math
+  if (left){ //fin1 math
     m_1 = -0.242625;
     m_2 = 0.405512;
     x_1 = fin_len*sin(theta);
@@ -165,9 +165,6 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     double root = a - 4*b*c;
     Complex c(root, 0);
     top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
-    if (top < 0){
-      top = -0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
-    }
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(top/bottom));
