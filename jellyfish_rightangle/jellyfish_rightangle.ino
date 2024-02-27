@@ -13,7 +13,7 @@ double beta_2;
 double alpha_1 = 0;
 double alpha_2 = 0;
 double beta_1_offset = 4;
-double beta_2_offset = 17;
+double beta_2_offset = 9;
 //double k_air = 1.5;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
