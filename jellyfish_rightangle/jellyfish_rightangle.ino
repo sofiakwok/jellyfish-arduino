@@ -12,9 +12,9 @@ double beta_2;
 //left = negative, right = positive
 double alpha_1 = 0;
 double alpha_2 = 0;
-double beta_1_offset = 15;
+double beta_1_offset = 4;
 double beta_2_offset = 17;
-double k_air = 1.5;
+//double k_air = 1.5;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
 
@@ -85,13 +85,13 @@ void showNewData() {
       Serial.print("This just in ... ");
       Serial.println(receivedChar);
       if (receivedChar == 's'){
-        alpha_1 -= k_air*10;
+        alpha_1 -= 10;
       } else if (receivedChar == 'w'){
         alpha_1 += 10;
       } else if (receivedChar == 'i'){
         alpha_2 += 10;
       } else if (receivedChar == 'k'){
-        alpha_2 -= k_air*10;
+        alpha_2 -= 10;
       }
       if (abs(alpha_1) >= threshold) {
         int sign = (alpha_1 > 0) - (alpha_1 < 0);
