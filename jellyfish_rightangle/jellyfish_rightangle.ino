@@ -21,6 +21,7 @@ int theta = 0;
 char receivedChar;
 bool startLoop = false;
 bool newData = false;
+double speed = 3;
 
 void setup() {
   // put your setup code here, to run once:
@@ -37,6 +38,7 @@ void loop() {
   recvOneChar();
     // stroke continuously scans from 0 to 180 degrees
     // fins actually go from 0 to 90 because of the 2:1 gear ratio
+    // jellyfish can do 60 deg in 0.1 sec
   while(startLoop){
     //Serial.print("\n Loop 1 \n");
     for(theta = 180; theta > 0; theta--)  
@@ -49,7 +51,7 @@ void loop() {
       //Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);                
-      delay(15);                   
+      delay(speed);                   
     } 
     //Serial.print("\n Loop 2 \n");
     for(theta = 0; theta < 180; theta++)    
@@ -62,7 +64,7 @@ void loop() {
       //Serial.print(" ");
       fin1.write(180 - beta_1 - beta_1_offset);
       fin2.write(beta_2 + beta_2_offset);           
-      delay(15);       
+      delay(speed);       
     }
   }
 }
