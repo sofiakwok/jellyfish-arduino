@@ -123,7 +123,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   //all measurements in inches and taken from Solidworks
   double d = 2.45; // length of outer servo attachment to steer rudders 
   double l = 0.568898; // length of servo arm
-  double r = 0.25; // length of rudders
+  double r = 0.2481; // length of arm used for changing alpha from rotation axis
   double fin_len = 2.15178;
   
   // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
@@ -144,7 +144,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
 
   if (left){ //for fin1 math
     m_1 = -0.311024;
-    m_2 = 0.405394;
+    m_2 = 1.165354;
     x_1 = fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
     x_2 = r*sin(alpha + theta + 3.1415/2) + x_1;
@@ -158,7 +158,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else { // for fin 2
     m_1 = 0.311024;
-    m_2 = 0.405394;
+    m_2 = 1.165354;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
     x_2 = -r*sin(alpha + theta + 3.1415/2) + x_1;
