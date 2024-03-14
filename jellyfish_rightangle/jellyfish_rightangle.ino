@@ -23,14 +23,16 @@ bool startLoop = false;
 bool newData = false;
 double speed = 3;
 
+double starting_angle = 170;
+
 void setup() {
   // put your setup code here, to run once:
   stroke.attach(9); // for controlling theta
   fin1.attach(10); // for controlling rudder 1
   fin2.attach(11); // for controlling rudder 2
   stroke.write(180);
-  fin1.write(180 - 100 - beta_1_offset); //because fin1 is flipped
-  fin2.write(100 + beta_2_offset);
+  fin1.write(180 - starting_angle - beta_1_offset); //because fin1 is flipped
+  fin2.write(starting_angle + beta_2_offset);
   Serial.begin(9600);
 }
 
@@ -139,8 +141,9 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   double a = 0;
   double b = 0;
   double c = 0;
-  double top = 0;
-  double bottom = 0;
+  double root = 0;
+  Complex top(0, 0);
+  Complex bottom(0, 0);
 
   if (left){ //for fin1 math
     m_1 = -0.311024;
@@ -152,10 +155,12 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     a = pow(4*l*x_2 - 4*l*m_1, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-    double root = a - 4*b*c;
+    root = a - 4*b*c;
     Complex c(root, 0);
-    top = 0.5*c.c_sqrt().real() + 2*l*m_1 - 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    top = c.c_sqrt();
+    top *= 0.5;
+    top += 2*l*m_1 - 2*l*x_2; 
+    bottom.set(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2), 0);
   } else { // for fin 2
     m_1 = 0.311024;
     m_2 = 1.165354;
@@ -166,12 +171,15 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
-    double root = a - 4*b*c;
+    root = a - 4*b*c;
     Complex c(root, 0);
-    top = 0.5*c.c_sqrt().real() - 2*l*m_1 + 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    top = c.c_sqrt();
+    top *= 0.5;
+    top += -2*l*m_1 + 2*l*x_2; 
+    bottom.set(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2), 0);
   }
-  double beta = 2*(atan(top/bottom));
+  Complex fraction = top/bottom;
+  double beta = 2*fraction.c_atan().real();
   //convert back to degrees 
   double beta_deg = 180/3.1415*beta;
   return beta_deg;
